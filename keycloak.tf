@@ -586,6 +586,14 @@ resource "keycloak_custom_identity_provider_mapper" "adfs_admin_role_mapper" {
   }
 }
 
+# Add Admin role to dipex client
+resource "keycloak_openid_client_service_account_realm_role" "dipex_admin_role" {
+  count                   = var.keycloak_dipex_client_enabled == true ? 1 : 0 
+  realm_id                = keycloak_realm.mo.id
+  service_account_user_id = keycloak_openid_client.dipex[0].service_account_user_id
+  role                    = keycloak_role.admin.name
+}
+
 resource "keycloak_custom_identity_provider_mapper" "adfs_owner_role_mapper" {
   count                    = var.keycloak_idp_enable == true ? 1 : 0
   realm                    = keycloak_realm.mo.id
