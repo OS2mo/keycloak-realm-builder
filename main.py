@@ -85,6 +85,13 @@ class Settings(BaseSettings):
     #       tests/manual/keycloak-client-secret.py
     keycloak_dipex_client_secret: Optional[str]
 
+    # Toggle orgviewer client.
+    keycloak_orgviewer_client_enabled: bool = False
+    # Token lifespan is 0 for now. We can remove this, once the RBAC reader
+    # role works _and_ orgviewer implement keycloak in the frontend.
+    keycloak_orgviewer_token_lifespan: PositiveInt = 0
+    keycloak_orgviewer_client_secret: Optional[str]
+
     # Toggles EGIR client enablement
     keycloak_egir_client_enabled: bool = False
 
@@ -133,6 +140,7 @@ class Settings(BaseSettings):
                 "keycloak_idp_signon_service_url",
             ),
             "keycloak_dipex_client_enabled": ("keycloak_dipex_client_secret",),
+            "keycloak_orgviewer_client_enabled": ("keycloak_orgviewer_client_secret",),
             "keycloak_egir_client_enabled": ("keycloak_egir_client_secret",),
             "keycloak_lora_realm_enabled": ("keycloak_lora_client_secret",),
             "keycloak_lora_dipex_client_enabled": (
