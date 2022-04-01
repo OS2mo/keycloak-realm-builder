@@ -59,6 +59,17 @@ variable "keycloak_egir_client_web_origin" {
   description = ""
 }
 
+variable "keycloak_orgviewer_client_enabled" {
+  type        = bool
+  description = ""
+}
+
+variable "keycloak_orgviewer_client_secret" {
+  type        = string
+  description = ""
+  sensitive   = true
+}
+
 variable "keycloak_dipex_client_enabled" {
   type        = bool
   description = ""
@@ -461,6 +472,19 @@ resource "keycloak_openid_client" "dipex" {
   service_accounts_enabled = true
 
   client_secret = var.keycloak_dipex_client_secret
+}
+
+resource "keycloak_openid_client" "orgviewer" {
+  count     = var.keycloak_orgviewer_client_enabled == true ? 1 : 0
+  realm_id  = keycloak_realm.mo.id
+  client_id = "orgviewer"
+  enabled   = var.keycloak_orgviewer_client_enabled
+
+  name                     = "ORGVIEWER"
+  access_type              = "CONFIDENTIAL"
+  service_accounts_enabled = true
+
+  client_secret = var.keycloak_orgviewer_client_secret
 }
 
 resource "keycloak_openid_client_service_account_realm_role" "dipex_admin_role" {
