@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     keycloak_orgviewer_client_enabled: bool = False
     # Token lifespan is 0 for now. We can remove this, once the RBAC reader
     # role works _and_ orgviewer implement keycloak in the frontend.
-    keycloak_orgviewer_token_lifespan: int = 0
+    keycloak_orgviewer_token_lifespan: PositiveInt = 60 * 60 * 60 * 24 * 365
     keycloak_orgviewer_client_secret: Optional[str]
 
     # Toggles EGIR client enablement
