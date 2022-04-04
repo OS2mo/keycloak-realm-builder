@@ -165,31 +165,31 @@ variable "keycloak_ssl_required_lora" {
   default     = "all"
 }
 
-# NOT IMPLEMENTED
 variable "keycloak_mo_token_lifespan" {
   type        = number
   description = ""
 }
 
-# NOT IMPLEMENTED
 variable "keycloak_dipex_token_lifespan" {
   type        = number
   description = ""
 }
 
-# NOT IMPLEMENTED
 variable "keycloak_lora_token_lifespan" {
   type        = number
   description = ""
 }
 
-# NOT IMPLEMENTED
 variable "keycloak_lora_dipex_token_lifespan" {
   type        = number
   description = ""
 }
 
-# NOT IMPLEMENTED
+variable "keycloak_orgviewer_token_lifespan" {
+  type        = number
+  description = ""
+}
+
 variable "keycloak_lora_client_secret" {
   type        = string
   description = ""
@@ -429,6 +429,7 @@ resource "keycloak_openid_client" "mo_frontend" {
   name                  = "OS2mo Frontend"
   access_type           = "PUBLIC"
   standard_flow_enabled = true
+  access_token_lifespan = var.keycloak_mo_token_lifespan
 
   valid_redirect_uris = var.keycloak_mo_client_redirect_uri
   web_origins         = var.keycloak_mo_client_web_origin
@@ -471,6 +472,7 @@ resource "keycloak_openid_client" "dipex" {
   name                     = "DIPEX"
   access_type              = "CONFIDENTIAL"
   service_accounts_enabled = true
+  access_token_lifespan    = var.keycloak_dipex_token_lifespan
 
   client_secret = var.keycloak_dipex_client_secret
 }
@@ -491,6 +493,7 @@ resource "keycloak_openid_client" "orgviewer" {
   name                     = "ORGVIEWER"
   access_type              = "CONFIDENTIAL"
   service_accounts_enabled = true
+  access_token_lifespan    = var.keycloak_orgviewer_token_lifespan
 
   client_secret = var.keycloak_orgviewer_client_secret
 }
@@ -511,6 +514,7 @@ resource "keycloak_openid_client" "lora_dipex" {
   name                     = "DIPEX"
   access_type              = "CONFIDENTIAL"
   service_accounts_enabled = true
+  access_token_lifespan    = var.keycloak_lora_dipex_token_lifespan
 
   client_secret = var.keycloak_lora_dipex_client_secret
 }
