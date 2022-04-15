@@ -338,6 +338,18 @@ resource "keycloak_role" "update_roles" {
   description = each.value
 }
 
+resource "keycloak_role" "file_roles" {
+  for_each = {
+    list_files          = "List files stored in MO"
+    download_files      = "Download files stored in MO"
+    upload_files        = "Upload files to MO"
+  }
+
+  realm_id    = keycloak_realm.mo.id
+  name        = each.key
+  description = each.value
+}
+
 resource "keycloak_role" "reader" {
   realm_id        = keycloak_realm.mo.id
   name            = "reader"
@@ -366,6 +378,13 @@ resource "keycloak_role" "updater" {
   composite_roles = [for role in keycloak_role.update_roles : role.id]
 }
 
+resource "keycloak_role" "file_admin" {
+  realm_id        = keycloak_realm.mo.id
+  name            = "updater"
+  description     = "All file accesses."
+  composite_roles = [for role in keycloak_role.file_roles : role.id]
+}
+
 resource "keycloak_role" "writer" {
   realm_id    = keycloak_realm.mo.id
   name        = "writer"
@@ -392,7 +411,8 @@ resource "keycloak_role" "admin" {
   name        = "admin"
   description = "Write access to everything in MO"
   composite_roles = [
-    keycloak_role.owner.id
+    keycloak_role.owner.id,
+    keycloak_role.file_admin.id,
   ]
 }
 
