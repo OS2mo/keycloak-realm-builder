@@ -30,6 +30,24 @@ services:
       retries: 3
       start_period: 60s
 
+  keycloak-sd:
+    build:
+      context: silkeborg
+    environment:
+      POSTGRES_CONNECTION_STRING: postgres://keycloak:keycloak@keycloak-db/keycloak?sslmode=disable
+
+      TF_VAR_keycloak_admin_username: admin
+      TF_VAR_keycloak_admin_password: admin
+      TF_VAR_keycloak_url: "http://keycloak:8080"
+
+      TF_VAR_keycloak_client_name: sd
+      TF_VAR_keycloak_client_secret: 1ca5ef4a-eed9-4142-9c82-f8e4bab67d9e
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      keycloak-gen:
+        condition: service_completed_successfully
+
   keycloak-gen:
     build: .
     environment:
