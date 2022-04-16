@@ -3,9 +3,3 @@
 # SPDX-License-Identifier: MPL-2.0
 
 .terraform
-.cache
-.idea
-venv
-__pycache__
-realm.json
-keycloak.json
