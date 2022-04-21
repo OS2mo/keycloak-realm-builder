@@ -36,6 +36,15 @@ class KeycloakUser(BaseModel):
 
 
 class Settings(BaseSettings):
+    class Config:
+        @classmethod
+        def prepare_field(cls, field) -> None:  # type: ignore
+            super().prepare_field(field)  # type: ignore
+            # Add optional TF_VAR prefix
+            env_names = field.field_info.extra["env_names"]
+            prefix_env_names = set(map(lambda x: "tf_var_" + x, env_names))
+            field.field_info.extra["env_names"] = set.union(env_names, prefix_env_names)
+
     # Keycloak admin credentials
     keycloak_admin_client_id: str = "admin-cli"
     keycloak_admin_username: str = "terraform"
