@@ -18,6 +18,8 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
 
+  PYTEST_COV_MODULE: .
+
 cache:
   key: "${CI_JOB_NAME}"
   paths:
@@ -48,6 +50,10 @@ include:
   - project: labs/salt-automation
     ref: master
     file: /gitlab-ci-templates/common/config-updater-meta.v1.yml
+  - project: labs/salt-automation
+    ref: master
+    file: /gitlab-ci-templates/python/pytest.v1.yml
+
 
 # Lint stage
 #############

@@ -15,7 +15,7 @@ pydantic = {extras = ["email"], version = "^1.8.2"}
 click = "^8.0.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "6.2.3"
+pytest = "^7.1.1"
 black = "21.4b2"
 flake8 = "3.9.1"
 mypy = "0.812"
