@@ -15,7 +15,7 @@ variables:
   REALMBUILDER_RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-keycloak-realm-builder
 
   INTEGRATIONBUILDER_IMAGE_SHA: ${CI_REGISTRY_IMAGE}/integration-builder:${CI_COMMIT_SHA}
-  REALMBUILDER_RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-keycloak-integration-builder
+  INTEGRATIONBUILDER_RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-keycloak-integration-builder
 
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"

@@ -1,3 +1,3 @@
-Release type: minor
+Release type: patch
 
-[#49668] Integration client builder
+[#49668] Fix CI mistake
