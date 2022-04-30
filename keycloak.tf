@@ -340,9 +340,9 @@ resource "keycloak_role" "update_roles" {
 
 resource "keycloak_role" "file_roles" {
   for_each = {
-    list_files          = "List files stored in MO"
-    download_files      = "Download files stored in MO"
-    upload_files        = "Upload files to MO"
+    list_files     = "List files stored in MO"
+    download_files = "Download files stored in MO"
+    upload_files   = "Upload files to MO"
   }
 
   realm_id    = keycloak_realm.mo.id

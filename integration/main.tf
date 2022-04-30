@@ -55,10 +55,10 @@ variable "client_roles" {
 }
 
 provider "keycloak" {
-  client_id = var.keycloak_admin_client_id
-  username  = var.keycloak_admin_username
-  password  = var.keycloak_admin_password
-  url       = var.keycloak_url
+  client_id = var.admin_client_id
+  username  = var.admin_username
+  password  = var.admin_password
+  url       = var.url
 }
 
 data "keycloak_realm" "mo" {
@@ -66,7 +66,7 @@ data "keycloak_realm" "mo" {
 }
 
 data "keycloak_role" "roles" {
-  for_each = var.keycloak_client_roles
+  for_each = var.client_roles
 
   realm_id = data.keycloak_realm.mo.id
   name     = each.key
@@ -74,18 +74,18 @@ data "keycloak_role" "roles" {
 
 resource "keycloak_openid_client" "client" {
   realm_id  = data.keycloak_realm.mo.id
-  client_id = var.keycloak_client_name
+  client_id = var.client_name
 
-  name                     = var.keycloak_client_name
+  name                     = var.client_name
   access_type              = "CONFIDENTIAL"
   service_accounts_enabled = true
-  access_token_lifespan    = var.keycloak_client_lifespan
+  access_token_lifespan    = var.client_lifespan
 
-  client_secret = var.keycloak_client_secret
+  client_secret = var.client_secret
 }
 
 resource "keycloak_openid_client_service_account_realm_role" "client_role" {
-  for_each = var.keycloak_client_roles
+  for_each = var.client_roles
 
   realm_id                = data.keycloak_realm.mo.id
   service_account_user_id = keycloak_openid_client.client.service_account_user_id
