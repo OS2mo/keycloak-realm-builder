@@ -51,7 +51,7 @@ variable "keycloak_client_secret" {
 variable "keycloak_client_roles" {
   type        = set(string)
   description = "Set of roles to attach to the client"
-  default     = set()
+  default     = toset([])
 }
 
 provider "keycloak" {
