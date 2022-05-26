@@ -11,11 +11,8 @@ stages:
 
 
 variables:
-  REALMBUILDER_IMAGE_SHA: ${CI_REGISTRY_IMAGE}/realm-builder:${CI_COMMIT_SHA}
-  REALMBUILDER_RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-keycloak-realm-builder
-
-  INTEGRATIONBUILDER_IMAGE_SHA: ${CI_REGISTRY_IMAGE}/integration-builder:${CI_COMMIT_SHA}
-  INTEGRATIONBUILDER_RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-keycloak-integration-builder
+  IMAGE_SHA: ${CI_REGISTRY_IMAGE}/realm-builder:${CI_COMMIT_SHA}
+  RELEASE_REGISTRY_IMAGE: index.docker.io/magentaaps/os2mo-keycloak-realm-builder
 
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
@@ -44,10 +41,10 @@ include:
     file: /gitlab-ci-templates/common/autopub.v1.yml
   - project: labs/salt-automation
     ref: master
-    file: /gitlab-ci-templates/common/docker-build-meta.v1.yml
+    file: /gitlab-ci-templates/common/docker-build.v1.yml
   - project: labs/salt-automation
     ref: master
-    file: /gitlab-ci-templates/common/docker-release-meta.v1.yml
+    file: /gitlab-ci-templates/common/docker-release.v1.yml
   - project: labs/salt-automation
     ref: master
     file: /gitlab-ci-templates/common/config-updater-meta.v1.yml
@@ -79,31 +76,14 @@ lint-all:
     - pre-commit run --all-files
 
 
-# Build stage
-#############
-
-Build RealmBuilder:
-  extends: .build-docker
-  variables:
-    CI_IMAGE: ${REALMBUILDER_IMAGE_SHA}
-
-
-Build IntegrationBuilder:
-  extends: .build-docker
-  variables:
-    CONTEXT: ${CI_PROJECT_DIR}/integration
-    DOCKERFILE: ${CI_PROJECT_DIR}/integration/Dockerfile
-    CI_IMAGE: ${INTEGRATIONBUILDER_IMAGE_SHA}
-
-
 # Test stage
 ############
 
-Test RealmBuilder:
+Test:
   stage: test
-  needs: ["Build RealmBuilder"]
+  needs: ["Build"]
   image:
-    name: ${REALMBUILDER_IMAGE_SHA}
+    name: ${IMAGE_SHA}
     entrypoint: [""]
   variables:
     KEYCLOAK_ADMIN_PASSWORD: "123"
@@ -113,40 +93,12 @@ Test RealmBuilder:
     - python3 main.py
 
 
-# Release stage
-###############
-
-Release RealmBuilder master:
-  extends: .release-master
-  variables:
-    CI_IMAGE: ${REALMBUILDER_IMAGE_SHA}
-    RELEASE_IMAGE: ${REALMBUILDER_RELEASE_REGISTRY_IMAGE}
-
-Release RealmBuilder version:
-  extends: .release-version
-  variables:
-    CI_IMAGE: ${REALMBUILDER_IMAGE_SHA}
-    RELEASE_IMAGE: ${REALMBUILDER_RELEASE_REGISTRY_IMAGE}
-
-
-Release IntegrationBuilder master:
-  extends: .release-master
-  variables:
-    CI_IMAGE: ${INTEGRATIONBUILDER_IMAGE_SHA}
-    RELEASE_IMAGE: ${INTEGRATIONBUILDER_RELEASE_REGISTRY_IMAGE}
-
-Release IntegrationBuilder version:
-  extends: .release-version
-  variables:
-    CI_IMAGE: ${INTEGRATIONBUILDER_IMAGE_SHA}
-    RELEASE_IMAGE: ${INTEGRATIONBUILDER_RELEASE_REGISTRY_IMAGE}
-
 # Deploy stage
 ##############
 
 Deploy to Dev:
   extends: .release-to-dev
-  needs: ["Release RealmBuilder version"]
+  needs: ["Release version"]
   variables:
     ENDPOINT: os2mo/flux/realmbuilder/update-dev
 
