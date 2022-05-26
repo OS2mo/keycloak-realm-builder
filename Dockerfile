@@ -6,7 +6,7 @@ FROM hashicorp/terraform:1.1.0
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-RUN apk add python3 py3-pip
+RUN apk add python3 py3-pip gcc
 RUN pip install --no-cache-dir click pydantic[email]
 
 WORKDIR /app
