@@ -411,8 +411,9 @@ resource "keycloak_role" "admin" {
   name        = "admin"
   description = "Write access to everything in MO"
   composite_roles = [
-    keycloak_role.owner.id,
     keycloak_role.file_admin.id,
+    keycloak_role.reader.id,
+    keycloak_role.writer.id,
   ]
 }
 
