@@ -234,209 +234,118 @@ resource "keycloak_realm" "lora" {
   ssl_required = var.keycloak_ssl_required_lora
 }
 
-# Roles
-resource "keycloak_role" "read_roles" {
-  for_each = {
-    read_org          = "Read access to organisation in MO"
-    read_org_unit     = "Read access to organisation unit(s) in MO"
-    read_association  = "Read access to association(s) in MO"
-    read_employee     = "Read access to employee(s) in MO"
-    read_engagement   = "Read access to engagement(s) in MO"
-    read_kle          = "Read access to KLE(s) in MO"
-    read_address      = "Read access to address(es) in MO"
-    read_leave        = "Read access to leave(s) in MO"
-    read_ituser       = "Read access to ituser(s) in MO"
-    read_itsystem     = "Read access to itsystem(s) in MO"
-    read_role         = "Read access to role(s) in MO"
-    read_manager      = "Read access to manager(s) in MO"
-    read_class        = "Read access to class(es) in MO"
-    read_related_unit = "Read access to related unit(s) in MO"
-    read_facet        = "Read access to facet(s) in MO"
-    read_version      = "Read access to version in MO"
-    read_healthcheck  = "Read access to healthcheck(s) in MO"
-  }
-
-  realm_id    = keycloak_realm.mo.id
-  name        = each.key
-  description = each.value
+# TODO: Fetch these from OS2mo
+locals {
+  collections = [
+    "address", "association", "class", "configuration", "employee",
+    "engagement_association", "engagement", "facet", "file", "health",
+    "itsystem", "ituser", "kle", "leave", "manager", "org", "org_unit",
+    "related_unit", "role", "version"
+  ]
+  permission_types = [
+    "read", "create", "update", "terminate", "delete", "refresh"
+  ]
 }
-
-resource "keycloak_role" "terminate_roles" {
-  for_each = {
-    terminate_org          = "Terminate access to organisation in MO"
-    terminate_org_unit     = "Terminate access to organisation unit(s) in MO"
-    terminate_association  = "Terminate access to association(s) in MO"
-    terminate_employee     = "Terminate access to employee(s) in MO"
-    terminate_engagement   = "Terminate access to engagement(s) in MO"
-    terminate_kle          = "Terminate access to KLE(s) in MO"
-    terminate_address      = "Terminate access to address(es) in MO"
-    terminate_leave        = "Terminate access to leave(s) in MO"
-    terminate_ituser       = "Terminate access to ituser(s) in MO"
-    terminate_itsystem     = "Terminate access to itsystem(s) in MO"
-    terminate_role         = "Terminate access to role(s) in MO"
-    terminate_manager      = "Terminate access to manager(s) in MO"
-    terminate_class        = "Terminate access to class(es) in MO"
-    terminate_related_unit = "Terminate access to related unit(s) in MO"
-    terminate_facet        = "Terminate access to facet(s) in MO"
-    terminate_version      = "Terminate access to version in MO"
-    terminate_healthcheck  = "Terminate access to healthcheck(s) in MO"
-  }
-
-  realm_id    = keycloak_realm.mo.id
-  name        = each.key
-  description = each.value
-}
-
-resource "keycloak_role" "create_roles" {
-  for_each = {
-    create_org          = "Create access to organisation in MO"
-    create_org_unit     = "Create access to organisation unit(s) in MO"
-    create_association  = "Create access to association(s) in MO"
-    create_employee     = "Create access to employee(s) in MO"
-    create_engagement   = "Create access to engagement(s) in MO"
-    create_kle          = "Create access to KLE(s) in MO"
-    create_address      = "Create access to address(es) in MO"
-    create_leave        = "Create access to leave(s) in MO"
-    create_ituser       = "Create access to ituser(s) in MO"
-    create_itsystem     = "Create access to itsystem(s) in MO"
-    create_role         = "Create access to role(s) in MO"
-    create_manager      = "Create access to manager(s) in MO"
-    create_class        = "Create access to class(es) in MO"
-    create_related_unit = "Create access to related unit(s) in MO"
-    create_facet        = "Create access to facet(s) in MO"
-    create_version      = "Create access to version in MO"
-    create_healthcheck  = "Create access to healthcheck(s) in MO"
-  }
-
-  realm_id    = keycloak_realm.mo.id
-  name        = each.key
-  description = each.value
-}
-
-resource "keycloak_role" "update_roles" {
-  for_each = {
-    update_org          = "Update access to organisation in MO"
-    update_org_unit     = "Update access to organisation unit(s) in MO"
-    update_association  = "Update access to association(s) in MO"
-    update_employee     = "Update access to employee(s) in MO"
-    update_engagement   = "Update access to engagement(s) in MO"
-    update_kle          = "Update access to KLE(s) in MO"
-    update_address      = "Update access to address(es) in MO"
-    update_leave        = "Update access to leave(s) in MO"
-    update_ituser       = "Update access to ituser(s) in MO"
-    update_itsystem     = "Update access to itsystem(s) in MO"
-    update_role         = "Update access to role(s) in MO"
-    update_manager      = "Update access to manager(s) in MO"
-    update_class        = "Update access to class(es) in MO"
-    update_related_unit = "Update access to related unit(s) in MO"
-    update_facet        = "Update access to facet(s) in MO"
-    update_version      = "Update access to version in MO"
-    update_healthcheck  = "Update access to healthcheck(s) in MO"
-  }
-
-  realm_id    = keycloak_realm.mo.id
-  name        = each.key
-  description = each.value
-}
-
-resource "keycloak_role" "file_roles" {
-  for_each = {
+locals {
+  os2mo_permission = merge({
+    for tup in setproduct(local.permission_types, local.collections):
+       "${tup[0]}_${tup[1]}" => "${tup[0]}-access for ${tup[1]}"
+  },{
     list_files     = "List files stored in MO"
     download_files = "Download files stored in MO"
     upload_files   = "Upload files to MO"
-  }
+  })
+}
+
+resource "keycloak_role" "roles" {
+  for_each    = local.os2mo_permission
 
   realm_id    = keycloak_realm.mo.id
   name        = each.key
   description = each.value
 }
 
-resource "keycloak_role" "reader" {
-  realm_id        = keycloak_realm.mo.id
-  name            = "reader"
-  description     = "Read access to everything in MO"
-  composite_roles = [for role in keycloak_role.read_roles : role.id]
+locals {
+  composite_roles = merge({
+    "reader": ["read_.*", "Read access to everything"],
+    "creator": ["create_.*", "Create access to everything"],
+    "updater": ["update_.*", "Update access to everything"],
+    "terminator": ["terminate_.*", "Terminate access to everything"],
+    "deleter": ["delete_.*", "Delete access to everything"],
+    "refresher": ["refresh_.*", "Refresh access to everything"],
+  }, {
+    for collection in local.collections:
+      "${collection}_admin" => [".*_${collection}", "Full access to ${collection}"]
+  }, {
+    "file_admin": [".*_files", "Full access to files"],
+  })
 }
 
-resource "keycloak_role" "terminator" {
-  realm_id        = keycloak_realm.mo.id
-  name            = "terminator"
-  description     = "Terminate access to everything in MO"
-  composite_roles = [for role in keycloak_role.terminate_roles : role.id]
-}
+resource "keycloak_role" "composite_roles" {
+  for_each = local.composite_roles
 
-resource "keycloak_role" "creator" {
   realm_id        = keycloak_realm.mo.id
-  name            = "creator"
-  description     = "Create access to everything in MO"
-  composite_roles = [for role in keycloak_role.create_roles : role.id]
-}
-
-resource "keycloak_role" "updater" {
-  realm_id        = keycloak_realm.mo.id
-  name            = "updater"
-  description     = "Update access to everything in MO"
-  composite_roles = [for role in keycloak_role.update_roles : role.id]
-}
-
-resource "keycloak_role" "file_admin" {
-  realm_id        = keycloak_realm.mo.id
-  name            = "file_admin"
-  description     = "All file accesses."
-  composite_roles = [for role in keycloak_role.file_roles : role.id]
+  name            = each.key
+  description     = each.value[1]
+  composite_roles = [
+    for role in keycloak_role.roles:
+      role.id if can(regex(each.value[0], role.name))
+  ]
 }
 
 resource "keycloak_role" "writer" {
   realm_id    = keycloak_realm.mo.id
   name        = "writer"
-  description = "Write access to everything in MO"
+  description = "Write access to everything"
   composite_roles = [
-    keycloak_role.terminator.id,
-    keycloak_role.creator.id,
-    keycloak_role.updater.id,
+    keycloak_role.composite_roles["creator"].id,
+    keycloak_role.composite_roles["updater"].id,
+    keycloak_role.composite_roles["terminator"].id,
+    keycloak_role.composite_roles["deleter"].id,
+    keycloak_role.composite_roles["refresher"].id,
   ]
 }
 
 resource "keycloak_role" "owner" {
   realm_id    = keycloak_realm.mo.id
   name        = "owner"
-  description = "Only write access to units of which the user is owner in MO"
+  description = "Special write access role, allowing only write acces to entities of which the user is owner in MO"
   composite_roles = [
-    keycloak_role.reader.id,
-    keycloak_role.writer.id,
-  ]
-}
-
-resource "keycloak_role" "admin" {
-  realm_id    = keycloak_realm.mo.id
-  name        = "admin"
-  description = "Write access to everything in MO"
-  composite_roles = [
-    keycloak_role.file_admin.id,
-    keycloak_role.reader.id,
+    keycloak_role.composite_roles["reader"].id,
     keycloak_role.writer.id,
   ]
 }
 
 locals {
-  roles = merge(
+  subroles = merge(
     {
-      for role in keycloak_role.read_roles : role.name => role.id
+      for role in keycloak_role.roles : role.name => role.id
     },
     {
-      for role in keycloak_role.create_roles : role.name => role.id
+      for role in keycloak_role.composite_roles: role.name => role.id
     },
     {
-      for role in keycloak_role.update_roles : role.name => role.id
-    },
-    {
-      for role in keycloak_role.terminate_roles : role.name => role.id
-    },
-    {
-      reader = keycloak_role.reader.id
       owner  = keycloak_role.owner.id
-      admin  = keycloak_role.admin.id
       writer = keycloak_role.writer.id
+    }
+  )
+}
+
+resource "keycloak_role" "admin" {
+  realm_id    = keycloak_realm.mo.id
+  name        = "admin"
+  description = "Full access to everything"
+  composite_roles = [
+    for name, id in local.subroles:
+      id
+  ]
+}
+
+locals {
+  roles = merge(
+    local.subroles,
+    {
+      admin = keycloak_role.admin.id
     }
   )
 }
@@ -528,7 +437,7 @@ resource "keycloak_openid_client_service_account_realm_role" "orgviewer_reader_r
   count                   = var.keycloak_orgviewer_client_enabled == true ? 1 : 0
   realm_id                = keycloak_realm.mo.id
   service_account_user_id = keycloak_openid_client.orgviewer[0].service_account_user_id
-  role                    = keycloak_role.reader.name
+  role                    = keycloak_role.composite_roles["reader"].name
 }
 
 resource "keycloak_openid_client" "lora_dipex" {
