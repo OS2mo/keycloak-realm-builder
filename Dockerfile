@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Magenta ApS
 #
 # SPDX-License-Identifier: MPL-2.0
-FROM hashicorp/terraform:1.3.8@sha256:e581888de7fc094f49186fad27d9e0f216bf1d0a5a12d13ff940b509adbf7f19
+FROM hashicorp/terraform:1.5.6@sha256:1b97a8fea07928585d74ad83683aabe6df2ac24fdc06cbd5382bfaa688063b05
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
