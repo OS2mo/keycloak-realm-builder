@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # SPDX-FileCopyrightText: Magenta ApS
 # SPDX-License-Identifier: MPL-2.0
 
