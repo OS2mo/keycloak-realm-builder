@@ -61,17 +61,6 @@ variable "keycloak_orgviewer_client_secret" {
   sensitive   = true
 }
 
-variable "keycloak_dipex_client_enabled" {
-  type        = bool
-  description = ""
-}
-
-variable "keycloak_dipex_client_secret" {
-  type        = string
-  description = ""
-  sensitive   = true
-}
-
 variable "keycloak_realm_users" {
   type = list(object({
     username  = string
@@ -141,11 +130,6 @@ variable "keycloak_ssl_required_mo" {
 }
 
 variable "keycloak_mo_token_lifespan" {
-  type        = number
-  description = ""
-}
-
-variable "keycloak_dipex_token_lifespan" {
   type        = number
   description = ""
 }
@@ -317,38 +301,6 @@ resource "keycloak_openid_user_attribute_protocol_mapper" "mo_client_uuid_mapper
 
   user_attribute = "object-guid"
   claim_name     = "uuid"
-}
-
-resource "keycloak_openid_client" "dipex" {
-  count     = var.keycloak_dipex_client_enabled == true ? 1 : 0
-  realm_id  = keycloak_realm.mo.id
-  client_id = "dipex"
-  enabled   = var.keycloak_dipex_client_enabled
-
-  name                     = "DIPEX"
-  access_type              = "CONFIDENTIAL"
-  service_accounts_enabled = true
-  access_token_lifespan    = var.keycloak_dipex_token_lifespan
-
-  client_secret = var.keycloak_dipex_client_secret
-}
-
-resource "keycloak_openid_client_service_account_realm_role" "dipex_admin_role" {
-  count                   = var.keycloak_dipex_client_enabled == true ? 1 : 0
-  realm_id                = keycloak_realm.mo.id
-  service_account_user_id = keycloak_openid_client.dipex[0].service_account_user_id
-  role                    = keycloak_role.admin.name
-}
-
-resource "keycloak_openid_hardcoded_claim_protocol_mapper" "dipex_uuid_claim" {
-  count = var.keycloak_dipex_client_enabled == true ? 1 : 0
-
-  realm_id  = keycloak_realm.mo.id
-  client_id = keycloak_openid_client.dipex[0].id
-  name      = "hardcoded-uuid"
-
-  claim_name  = "uuid"
-  claim_value = "d1fec000-baad-c0de-0000-004449504558"
 }
 
 resource "keycloak_openid_client" "orgviewer" {
