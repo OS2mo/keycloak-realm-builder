@@ -271,6 +271,13 @@ resource "keycloak_role" "service_api" {
   description = "Can access OS2mo's old Service API"
 }
 
+resource "keycloak_role" "lora_api" {
+  realm_id    = keycloak_realm.mo.id
+  name        = "lora_api"
+  description = "Can access OS2mo's very old LoRa API"
+}
+
+
 locals {
   roles = merge(
     local.subroles,
