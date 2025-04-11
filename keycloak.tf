@@ -186,6 +186,7 @@ locals {
     acknowledge_event = "Acknowledge events"
     silence_event     = "Silence events"
     unsilence_event   = "Unsilence events"
+    read_event_all    = "Read all events, regardless of owner"
   })
 }
 
