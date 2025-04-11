@@ -162,7 +162,7 @@ locals {
     "address", "association", "auditlog", "accesslog", "class", "configuration",
     "employee", "engagement_association", "engagement", "facet", "file",
     "health", "itsystem", "ituser", "kle", "leave", "listener", "manager",
-    "owner", "org",
+    "namespace", "owner", "org",
     # TODO: You can remove "role" once #59798 is deployed everywhere
     "org_unit", "registration", "related_unit", "role", "rolebinding", "version"
   ]
