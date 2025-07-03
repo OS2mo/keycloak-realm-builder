@@ -159,9 +159,12 @@ resource "keycloak_realm" "mo" {
 locals {
   collections = [
     "address", "association", "auditlog", "class", "configuration", "employee",
-    "engagement_association", "engagement", "facet", "file", "health",
+    "engagement_association", "engagement", "facet", "file",
     "itsystem", "ituser", "kle", "leave", "manager", "owner", "org",
-    "org_unit", "registration", "related_unit", "role", "version"
+    "org_unit", "registration", "related_unit", "role",
+    # TODO: Remove this when everyone has OS2mo version xx.yy.zz or higher
+    "health",
+    "version",
   ]
   permission_types = [
     "read", "create", "update", "terminate", "delete", "refresh"
