@@ -233,6 +233,12 @@ resource "keycloak_role" "roles" {
 }
 
 locals {
+  # Uploading does not follow the "${type}_${collection}" pattern, so
+  # "file_admin" cannot be generated from collection_permissions alone.
+  file_permissions = [
+    "read_file", "upload_files",
+  ]
+
   composite_roles = merge({
     "reader" : ["^read_.*", "Read access to everything"],
     "creator" : ["^create_.*", "Create access to everything"],
@@ -247,7 +253,11 @@ locals {
       "Full access to ${collection}"
     ]
     }, {
-    "file_admin" : [".*_files", "Full access to files"],
+    # Overrides the generated "file_admin", which covers only "read_file".
+    "file_admin" : [
+      "^(${join("|", local.file_permissions)})$",
+      "Full access to files"
+    ],
   })
 }
 
