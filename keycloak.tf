@@ -185,11 +185,21 @@ locals {
   permission_types = [
     "read", "create", "update", "terminate", "delete", "refresh"
   ]
+  # OS2mo does not support every permission type on every collection. They are
+  # uniform here for now, but keying them per collection lets the exceptions be
+  # expressed without dropping the whole cross product.
+  collection_permissions = {
+    for collection in local.collections : collection => local.permission_types
+  }
 }
 locals {
   os2mo_permission = merge({
-    for tup in setproduct(local.permission_types, local.collections) :
-    "${tup[0]}_${tup[1]}" => "${tup[0]}-access for ${tup[1]}"
+    for pair in flatten([
+      for collection, types in local.collection_permissions : [
+        for type in types : { collection = collection, type = type }
+      ]
+    ]) :
+    "${pair.type}_${pair.collection}" => "${pair.type}-access for ${pair.collection}"
     }, {
     # Files
     list_files     = "List files stored in MO"
@@ -224,9 +234,9 @@ locals {
     "deleter" : ["^delete_.*", "Delete access to everything"],
     "refresher" : ["^refresh_.*", "Refresh access to everything"],
     }, {
-    for collection in local.collections :
+    for collection, types in local.collection_permissions :
     "${collection}_admin" => [
-      "^(${join("|", local.permission_types)})_${collection}$",
+      "^(${join("|", types)})_${collection}$",
       "Full access to ${collection}"
     ]
     }, {
