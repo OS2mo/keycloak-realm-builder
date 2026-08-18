@@ -174,6 +174,7 @@ resource "keycloak_realm" "mo" {
 locals {
   collection_permissions = {
     accesslog       = ["read"]
+    actor           = ["read"]
     address         = ["read", "create", "update", "terminate", "delete", "refresh"]
     association     = ["read", "create", "update", "terminate", "refresh"]
     class           = ["read", "create", "update", "terminate", "delete", "refresh"]
