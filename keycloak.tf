@@ -165,31 +165,36 @@ resource "keycloak_realm" "mo" {
 }
 
 # TODO: Fetch these from OS2mo
+#
+# Only permissions that OS2mo enforces belong here. A role OS2mo never checks
+# grants nothing, and a permission missing from here can never be granted to
+# anyone. The authority is RBAC_MAP in OS2mo's mora/graphapi/rbac_map.py.
+#
+# A collection listing only "read" is read-only in OS2mo.
 locals {
-  collections = [
-    "address", "association", "accesslog", "class", "employee",
-    "engagement_association", "engagement", "event", "event_listener",
-    "event_namespace", "facet", "file", "itsystem", "ituser", "kle", "leave",
-    "manager", "owner", "org", "org_unit", "registration", "related_unit",
-    "rolebinding",
-    # TODO: You can remove "auditlog" once #64270 is deployed everywhere
-    "auditlog",
-    # TODO: You can remove "role" once #59798 is deployed everywhere
-    "role",
-    # TODO: You can remove "health" and "version" once OS2mo 43.3.0 is everywhere
-    "health",
-    "version",
-    # TODO: You can remove "configuration" once OS2mo 49.0.0 is everywhere
-    "configuration",
-  ]
-  permission_types = [
-    "read", "create", "update", "terminate", "delete", "refresh"
-  ]
-  # OS2mo does not support every permission type on every collection. They are
-  # uniform here for now, but keying them per collection lets the exceptions be
-  # expressed without dropping the whole cross product.
   collection_permissions = {
-    for collection in local.collections : collection => local.permission_types
+    accesslog       = ["read"]
+    address         = ["read", "create", "update", "terminate", "delete", "refresh"]
+    association     = ["read", "create", "update", "terminate", "refresh"]
+    class           = ["read", "create", "update", "terminate", "delete", "refresh"]
+    employee        = ["read", "create", "update", "terminate", "delete", "refresh"]
+    engagement      = ["read", "create", "update", "terminate", "delete", "refresh"]
+    event           = ["read"]
+    event_listener  = ["read", "create", "delete"]
+    event_namespace = ["read", "create", "delete"]
+    facet           = ["read", "create", "update", "terminate", "delete", "refresh"]
+    file            = ["read"]
+    itsystem        = ["read", "create", "update", "terminate", "delete", "refresh"]
+    ituser          = ["read", "create", "update", "terminate", "delete", "refresh"]
+    kle             = ["read", "create", "update", "terminate", "refresh"]
+    leave           = ["read", "create", "update", "terminate", "refresh"]
+    manager         = ["read", "create", "update", "terminate", "delete", "refresh"]
+    org             = ["read", "create"]
+    org_unit        = ["read", "create", "update", "terminate", "delete", "refresh"]
+    owner           = ["read", "create", "update", "terminate", "refresh"]
+    registration    = ["read"]
+    related_unit    = ["read", "update", "refresh"]
+    rolebinding     = ["read", "create", "update", "terminate", "delete", "refresh"]
   }
 }
 locals {
@@ -201,12 +206,13 @@ locals {
     ]) :
     "${pair.type}_${pair.collection}" => "${pair.type}-access for ${pair.collection}"
     }, {
-    # Files
-    list_files     = "List files stored in MO"
-    download_files = "Download files stored in MO"
-    upload_files   = "Upload files to MO"
+    # Files. Reading is covered by "read_file" above; uploading does not follow
+    # the "${type}_${collection}" pattern.
+    upload_files = "Upload files to MO"
 
-    # Events
+    # Events. These do not follow the "${type}_${collection}" pattern either.
+    # "read_event_all" is absent from RBAC_MAP: it is checked directly in
+    # full_event_resolver to bypass the owner filter.
     send_event        = "Send events"
     fetch_event       = "Fetch events"
     acknowledge_event = "Acknowledge events"
