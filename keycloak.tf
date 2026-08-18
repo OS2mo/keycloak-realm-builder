@@ -233,10 +233,15 @@ resource "keycloak_role" "roles" {
 }
 
 locals {
-  # Uploading does not follow the "${type}_${collection}" pattern, so
-  # "file_admin" cannot be generated from collection_permissions alone.
+  # Uploading and the event operations do not follow the
+  # "${type}_${collection}" pattern, so "file_admin" and "event_admin" cannot
+  # be generated from collection_permissions alone.
   file_permissions = [
     "read_file", "upload_files",
+  ]
+  event_permissions = [
+    "read_event", "read_event_all", "send_event", "fetch_event",
+    "acknowledge_event", "silence_event", "unsilence_event", "rerun_event",
   ]
 
   composite_roles = merge({
@@ -253,10 +258,15 @@ locals {
       "Full access to ${collection}"
     ]
     }, {
-    # Overrides the generated "file_admin", which covers only "read_file".
+    # These override the generated "file_admin" and "event_admin", which cover
+    # only "read_file" and "read_event" respectively.
     "file_admin" : [
       "^(${join("|", local.file_permissions)})$",
       "Full access to files"
+    ],
+    "event_admin" : [
+      "^(${join("|", local.event_permissions)})$",
+      "Full access to events"
     ],
   })
 }
