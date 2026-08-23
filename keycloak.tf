@@ -176,6 +176,7 @@ locals {
   ]
   partial_collections = {
     accesslog       = ["read"]
+    event           = ["read"]
     event_listener  = ["read", "create", "delete"]
     event_namespace = ["read", "create", "delete"]
     org             = ["read", "create"]
@@ -198,21 +199,6 @@ locals {
     }, {
     # Actors
     read_actor = "Read actors"
-
-    # Files
-    read_file    = "Read files stored in MO"
-    upload_files = "Upload files to MO"
-
-    # Events
-    read_event        = "Read events"
-    send_event        = "Send events"
-    fetch_event       = "Fetch events"
-    acknowledge_event = "Acknowledge events"
-    silence_event     = "Silence events"
-    unsilence_event   = "Unsilence events"
-    rerun_event       = "Rerun events"
-    # Absent from RBAC_MAP; checked directly in full_event_resolver.
-    read_event_all = "Read all events, regardless of owner"
   })
 }
 
@@ -238,12 +224,6 @@ locals {
       "^(${join("|", types)})_${collection}$",
       "Full access to ${collection}"
     ]
-    }, {
-    "file_admin" : ["^(read_file|upload_files)$", "Full access to files"],
-    "event_admin" : [
-      "^(read_event|read_event_all|send_event|fetch_event|acknowledge_event|silence_event|unsilence_event|rerun_event)$",
-      "Full access to events"
-    ],
   })
 }
 
