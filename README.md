@@ -30,6 +30,19 @@ The headers have corresponding comments in `keycloak.tf`
 
 We create realms for each major application area, so as to keep the auth for OS2mo and LoRa completely separate.
 
+### Realm signing key
+
+By default, Keycloak auto-generates the RSA key used to sign tokens and SAML messages; the certificate in the SAML SP descriptor at `/auth/realms/mo/broker/saml/endpoint/descriptor` is therefore auto-generated too.
+
+A custom keypair can be uploaded instead by setting `KEYCLOAK_REALM_RSA_PRIVATE_KEY` and `KEYCLOAK_REALM_RSA_CERTIFICATE` (both must be set). The values are PEM bodies, i.e. the output of:
+
+```
+grep -v -- "-----" cert.pem | tr -d '\n'
+grep -v -- "-----" key.pem | tr -d '\n'
+```
+
+The custom key is registered with a higher priority than the auto-generated key, which makes Keycloak use it as the active signing key. The auto-generated key is kept in place, so existing tokens remain verifiable until they expire. Note that replacing the key invalidates any SP metadata previously imported into the IdP (e.g. ADFS); the metadata must be re-imported.
+
 ### Roles
 
 Various roles for the OS2mo realm, providing fine-grained access control for the various API operations.

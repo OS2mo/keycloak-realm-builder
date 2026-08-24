@@ -123,6 +123,19 @@ variable "keycloak_idp_clock_skew" {
   description = ""
 }
 
+variable "keycloak_realm_rsa_private_key" {
+  type        = string
+  description = "PEM body (headers stripped) of the RSA private key used for realm signing, e.g. in the SAML SP descriptor"
+  sensitive   = true
+  default     = null
+}
+
+variable "keycloak_realm_rsa_certificate" {
+  type        = string
+  description = "PEM body (headers stripped) of the X509 certificate matching keycloak_realm_rsa_private_key"
+  default     = null
+}
+
 variable "keycloak_ssl_required_mo" {
   type        = string
   description = ""
@@ -162,6 +175,29 @@ resource "keycloak_realm" "mo" {
     ]
     default_locale = "en"
   }
+}
+
+# Realm signing key
+#
+# Keycloak auto-generates an RSA key (the "rsa-generated" provider, priority
+# 100) when the realm is created. That key signs both OIDC tokens and the SAML
+# SP descriptor served at /auth/realms/mo/broker/saml/endpoint/descriptor.
+#
+# When a custom keypair is supplied, we register it as a second "rsa" provider
+# with a higher priority, which makes Keycloak use it as the active signing key
+# in place of the generated one.
+resource "keycloak_realm_keystore_rsa" "mo_custom" {
+  count = var.keycloak_realm_rsa_private_key != null && var.keycloak_realm_rsa_certificate != null ? 1 : 0
+
+  name     = "rsa-custom"
+  realm_id = keycloak_realm.mo.id
+
+  private_key = var.keycloak_realm_rsa_private_key
+  certificate = var.keycloak_realm_rsa_certificate
+
+  enabled  = true
+  active   = true
+  priority = 1000
 }
 
 # TODO: Fetch these from OS2mo

@@ -86,6 +86,12 @@ class Settings(BaseSettings):
     keycloak_idp_signon_service_url: Optional[AnyHttpUrl]
     keycloak_idp_clock_skew: int = 10
 
+    # Custom realm signing key (RSA). When set, this keypair replaces the
+    # auto-generated one, e.g. in the SAML SP descriptor at
+    # /auth/realms/mo/broker/saml/endpoint/descriptor
+    keycloak_realm_rsa_private_key: Optional[str]
+    keycloak_realm_rsa_certificate: Optional[str]
+
     # Specifies whether SSL is required for Keycloak requests. Can be one of
     # "all", "external" or "none". The options are further described here:
     # https://www.keycloak.org/docs/latest/server_installation/#_setting_up_ssl
@@ -94,6 +100,13 @@ class Settings(BaseSettings):
     @root_validator
     def optionally_required(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Check that derived keys are set if master switch is set."""
+        pairwise_required_fields = (
+            "keycloak_realm_rsa_private_key",
+            "keycloak_realm_rsa_certificate",
+        )
+        pairwise_values = [values.get(field) for field in pairwise_required_fields]
+        if any(pairwise_values) and not all(pairwise_values):
+            raise ValueError(f"{pairwise_required_fields} must be set together")
         optionally_required_fields = {
             "keycloak_idp_enable": (
                 "keycloak_idp_signing_certificate",
