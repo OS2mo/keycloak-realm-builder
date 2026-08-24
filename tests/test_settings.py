@@ -36,19 +36,3 @@ def test_mixed_tf_var_settings(monkeypatch):
     settings = Settings()
     assert settings.keycloak_admin_username == "AzureDiamond"
     assert settings.keycloak_admin_password == "hunter2"
-
-
-def test_realm_rsa_key_requires_certificate(monkeypatch):
-    monkeypatch.setenv("keycloak_admin_password", "hunter2")
-    monkeypatch.setenv("keycloak_realm_rsa_private_key", "key")
-    with pytest.raises(ValidationError):
-        Settings()
-
-
-def test_realm_rsa_keypair(monkeypatch):
-    monkeypatch.setenv("keycloak_admin_password", "hunter2")
-    monkeypatch.setenv("keycloak_realm_rsa_private_key", "key")
-    monkeypatch.setenv("keycloak_realm_rsa_certificate", "cert")
-    settings = Settings()
-    assert settings.keycloak_realm_rsa_private_key == "key"
-    assert settings.keycloak_realm_rsa_certificate == "cert"

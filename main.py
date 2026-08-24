@@ -100,13 +100,6 @@ class Settings(BaseSettings):
     @root_validator
     def optionally_required(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Check that derived keys are set if master switch is set."""
-        pairwise_required_fields = (
-            "keycloak_realm_rsa_private_key",
-            "keycloak_realm_rsa_certificate",
-        )
-        pairwise_values = [values.get(field) for field in pairwise_required_fields]
-        if any(pairwise_values) and not all(pairwise_values):
-            raise ValueError(f"{pairwise_required_fields} must be set together")
         optionally_required_fields = {
             "keycloak_idp_enable": (
                 "keycloak_idp_signing_certificate",

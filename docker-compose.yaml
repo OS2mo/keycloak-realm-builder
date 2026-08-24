@@ -92,9 +92,6 @@ services:
       KEYCLOAK_IDP_ENTITY_ID: "http://localhost:8081"
       KEYCLOAK_IDP_LOGOUT_SERVICE_URL: "https://idp.filth.biz/simplesaml/saml2/idp/SingleLogoutService.php"
       KEYCLOAK_IDP_SIGNON_SERVICE_URL: "https://idp.filth.biz/simplesaml/saml2/idp/SSOService.php"
-      # Optional custom realm signing key (PEM bodies without headers)
-      KEYCLOAK_REALM_RSA_PRIVATE_KEY: ${KEYCLOAK_REALM_RSA_PRIVATE_KEY:-}
-      KEYCLOAK_REALM_RSA_CERTIFICATE: ${KEYCLOAK_REALM_RSA_CERTIFICATE:-}
     volumes:
       - keycloak-volume:/srv/
     depends_on:

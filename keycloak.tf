@@ -177,15 +177,6 @@ resource "keycloak_realm" "mo" {
   }
 }
 
-# Realm signing key
-#
-# Keycloak auto-generates an RSA key (the "rsa-generated" provider, priority
-# 100) when the realm is created. That key signs both OIDC tokens and the SAML
-# SP descriptor served at /auth/realms/mo/broker/saml/endpoint/descriptor.
-#
-# When a custom keypair is supplied, we register it as a second "rsa" provider
-# with a higher priority, which makes Keycloak use it as the active signing key
-# in place of the generated one.
 resource "keycloak_realm_keystore_rsa" "mo_custom" {
   count = var.keycloak_realm_rsa_private_key != null && var.keycloak_realm_rsa_certificate != null ? 1 : 0
 
@@ -195,8 +186,11 @@ resource "keycloak_realm_keystore_rsa" "mo_custom" {
   private_key = var.keycloak_realm_rsa_private_key
   certificate = var.keycloak_realm_rsa_certificate
 
-  enabled  = true
-  active   = true
+  enabled = true
+  active  = true
+  # Higher priority than the auto-generated "rsa-generated" key (priority 100),
+  # making this key the active signing key for OIDC tokens and the SAML SP
+  # descriptor at /auth/realms/mo/broker/saml/endpoint/descriptor.
   priority = 1000
 }
 
