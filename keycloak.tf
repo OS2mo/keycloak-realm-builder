@@ -528,7 +528,8 @@ resource "keycloak_saml_identity_provider" "adfs" {
   single_sign_on_service_url = var.keycloak_idp_signon_service_url
   single_logout_service_url  = var.keycloak_idp_logout_service_url
 
-  signature_algorithm = var.keycloak_idp_signed_requests == true ? "RSA_SHA256" : null
+  want_authn_requests_signed = var.keycloak_idp_signed_requests
+  signature_algorithm        = var.keycloak_idp_signed_requests == true ? "RSA_SHA256" : null
 
   extra_config = {
     allowedClockSkew = var.keycloak_idp_clock_skew
